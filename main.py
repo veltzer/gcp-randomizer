@@ -11,8 +11,25 @@ app = Flask(
     template_folder="static/templates",
 )
 
-@app.route("/", methods=["GET", "POST"])
+MODES = [
+    "Ionian",
+    "Dorian",
+    "Phrygian",
+    "Lydian",
+    "Mixolydian",
+    "Aeolian",
+    "Locrian"
+]
+
+@app.route("/")
 def root():
+    """ The root URL """
+    randomized_modes = MODES.copy()
+    random.shuffle(randomized_modes)
+    return render_template("index.html", randomized_modes=randomized_modes)
+
+@app.route("/general", methods=["GET", "POST"])
+def general():
     """ this is the root url """
     randomized_list = []
     if request.method == "POST":
@@ -20,7 +37,7 @@ def root():
         items = [item.strip() for item in items if item.strip()]
         random.shuffle(items)
         randomized_list = items
-    return render_template("index.html", randomized_list=randomized_list)
+    return render_template("general.html", randomized_list=randomized_list)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)

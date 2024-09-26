@@ -3,29 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice Randomizer</title>
+    <title>Music Modes Randomizer</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-        form { margin-bottom: 20px; }
-        textarea { width: 100%; height: 150px; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; }
         ul { list-style-type: none; padding: 0; }
+        li { background-color: #f4f4f4; margin-bottom: 10px; padding: 10px; border-radius: 5px; }
+        button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
-    <h1>Practice Randomizer</h1>
-    <form method="POST">
-        <label for="items">Enter your list items (one per line):</label><br>
-        <textarea name="items" id="items" required></textarea><br>
-        <input type="submit" value="Randomize">
-    </form>
-    
-    {% if randomized_list %}
-    <h2>Randomized List:</h2>
+    <h1>Music Modes Randomizer</h1>
+    <p>Here's your randomized list of music modes to practice:</p>
     <ul>
-        {% for item in randomized_list %}
-        <li>{{ loop.index }}. {{ item }}</li>
+        {% for mode in randomized_modes %}
+        <li>{{ loop.index }}. {{ mode }}</li>
         {% endfor %}
     </ul>
-    {% endif %}
+    <button onclick="location.reload()">Randomize Again</button>
 </body>
 </html>
