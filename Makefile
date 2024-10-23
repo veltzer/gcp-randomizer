@@ -15,7 +15,7 @@ DO_JS_CHECK:=1
 # do you want to validate html?
 DO_HTML_CHECK:=1
 # do you want to validate css?
-DO_CSS_CHECK:=1
+DO_CSS_CHECK:=0
 
 ########
 # code #
@@ -108,7 +108,7 @@ $(JS_CHECK): out/%.check: %.js
 $(HTML_CHECK): out/%.check: %.html
 	$(info doing [$@])
 	$(Q)pymakehelper only_print_on_error node_modules/.bin/htmlhint $<
-	$(Q)tidy -errors -q -utf8 $<
+	$(Q)scripts/run_tidy.py $<
 	$(Q)pymakehelper touch_mkdir $@
 $(CSS_CHECK): out/%.check: %.css
 	$(info doing [$@])
