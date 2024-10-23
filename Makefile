@@ -5,24 +5,25 @@
 DO_MKDBG:=0
 # do you want dependency on the makefile itself ?
 DO_ALLDEP:=1
-# do you want to check the javascript code?
-DO_CHECKJS:=1
-# do you want to validate html?
-DO_CHECKHTML:=1
-# do you want to validate css?
-DO_CHECKCSS:=1
+
 # do you want to check python code with pylint?
-DO_PYLINT:=1
+DO_PY_LINT:=1
 # do you want to check bash syntax?
 DO_BASH_CHECK:=1
+# do you want to check the javascript code?
+DO_JS_CHECK:=1
+# do you want to validate html?
+DO_HTML_CHECK:=1
+# do you want to validate css?
+DO_CSS_CHECK:=1
 
 ########
 # code #
 ########
 ALL:=
 
-PYTHON_SRC:=$(shell find scripts -type f -and -name "*.py" 2> /dev/null)
-PYTHON_LINT=$(addprefix out/, $(addsuffix .lint, $(basename $(PYTHON_SRC))))
+PY_SRC:=$(shell find scripts -type f -and -name "*.py" 2> /dev/null)
+PY_LINT=$(addprefix out/, $(addsuffix .lint, $(basename $(PY_SRC))))
 BASH_SRC:=$(shell find scripts -type f -and -name "*.sh" 2> /dev/null)
 BASH_CHECK:=$(addprefix out/, $(addsuffix .check, $(basename $(BASH_SRC))))
 JS_SRC:=$(shell find static/js -type f -and -name "*.js" 2> /dev/null)
@@ -32,25 +33,25 @@ HTML_CHECK:=$()
 CSS_SRC:=$(shell find static/css -type f -and -name "*.css" 2> /dev/null)
 CSS_CHECK:=$()
 
-ifeq ($(DO_PYLINT),1)
-ALL+=$(PYTHON_LINT)
-endif # DO_PYLINT
+ifeq ($(DO_PY_LINT),1)
+ALL+=$(PY_LINT)
+endif # DO_PY_LINT
 
 ifeq ($(DO_BASH_CHECK),1)
 ALL+=$(BASH_CHECK)
 endif # DO_BASH_CHECK
 
-ifeq ($(DO_CHECKJS),1)
+ifeq ($(DO_JS_CHECK),1)
 ALL+=$(JS_CHECK)
-endif # DO_CHECKJS
+endif # DO_JS_CHECK
 
-ifeq ($(DO_CHECKHTML),1)
+ifeq ($(DO_HTML_CHECK),1)
 ALL+=$(HTML_CHECK)
-endif # DO_CHECKHTML
+endif # DO_HTML_CHECK
 
-ifeq ($(DO_CHECKCSS),1)
+ifeq ($(DO_CSS_CHECK),1)
 ALL+=$(CSS_CHECK)
-endif # DO_CHECKCSS
+endif # DO_CSS_CHECK
 
 # silent stuff
 ifeq ($(DO_MKDBG),1)
@@ -71,8 +72,8 @@ all: $(ALL)
 .PHONY: debug
 debug:
 	$(info doing [$@])
-	$(info PYTHON_SRC is $(PYTHON_SRC))
-	$(info PYTHON_LINT is $(PYTHON_LINT))
+	$(info PY_SRC is $(PY_SRC))
+	$(info PY_LINT is $(PY_LINT))
 	$(info BASH_SRC is $(BASH_SRC))
 	$(info BASH_CHECK is $(BASH_CHECK))
 	$(info JS_SRC is $(JS_SRC))
@@ -93,7 +94,7 @@ clean_hard:
 ############
 # patterns #
 ############
-$(PYTHON_LINT): out/%.lint: %.py .pylintrc
+$(PY_LINT): out/%.lint: %.py .pylintrc
 	$(info doing [$@])
 	$(Q)pymakehelper error_on_print python -m pylint --reports=n --score=n $<
 	$(Q)pymakehelper touch_mkdir $@
