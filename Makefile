@@ -10,26 +10,11 @@ DO_CHECKJS:=1
 # do you want to validate html?
 DO_CHECKHTML:=1
 # do you want to validate css?
-DO_CHECKCSS:=0
+DO_CHECKCSS:=1
 
 ########
 # code #
 ########
-TOOL_COMPILER:=tools/closure-compiler-v20160822.jar
-TOOL_JSMIN:=tools/jsmin
-TOOL_CSS_VALIDATOR:=tools/css-validator/css-validator.jar
-TOOL_JSL:=tools/jsl/jsl
-TOOL_JSDOC:=node_modules/jsdoc/jsdoc.js
-TOOL_JSLINT:=node_modules/jslint/bin/jslint.js
-TOOL_GJSLINT:=/usr/bin/gjslint
-TOOL_YUICOMPRESSOR:=/usr/bin/yui-compressor
-TOOL_TIDY=/usr/bin/tidy
-TOOL_CSSTIDY=/usr/bin/csstidy
-
-JSCHECK:=out/jscheck.stamp
-HTMLCHECK:=out/html.stamp
-CSSCHECK:=out/css.stamp
-
 ALL:=
 CLEAN:=
 
@@ -82,28 +67,21 @@ clean:
 clean_hard:
 	$(info doing [$@])
 	$(Q)git clean -qffxd
-.PHONY: checkjs
-checkjs: $(JSCHECK)
-	$(info doing [$@])
-.PHONY: checkhtml
-checkhtml: $(HTMLCHECK)
-	$(info doing [$@])
-.PHONY: checkcss
-checkcss: $(CSSCHECK)
-	$(info doing [$@])
+
+############
+# patterns #
+############
 $(JSCHECK): $(SOURCES_JS)
 	$(info doing [$@])
 	$(Q)pymakehelper touch_mkdir $@
-# $(Q)pymakehelper only_print_on_error $(TOOL_GJSLINT) --flagfile support/gjslint.cfg $(SOURCES_JS)
-# $(Q)$(TOOL_JSL) --conf=support/jsl.conf --quiet --nologo --nosummary --nofilelisting $(SOURCES_JS)
 $(HTMLCHECK): $(SOURCES_HTML)
 	$(info doing [$@])
+	$(Q)pymakehelper only_print_on_error node_modules/.bin/htmlhint $<
+	$(Q)tidy -errors -q -utf8 $<
 	$(Q)pymakehelper touch_mkdir $@
-#$(Q)pymakehelper only_print_on_error node_modules/.bin/htmlhint $(SOURCES_HTML)
-#$(Q)$(TOOL_TIDY) -errors -q -utf8 $(SOURCES_HTML)
 $(CSSCHECK): $(SOURCES_CSS)
 	$(info doing [$@])
-	$(Q)pymakehelper wrapper_css_validator java -jar $(TOOL_CSS_VALIDATOR) --profile=css3 --output=text -vextwarning=true --warning=0 $(addprefix file:,$(SOURCES_CSS))
+	$(Q)pymakehelper only_print_on_error node_modules/.bin/stylelint $<
 	$(Q)pymakehelper touch_mkdir $@
 
 ##########
