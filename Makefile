@@ -16,24 +16,24 @@ DO_CHECKCSS:=1
 # code #
 ########
 ALL:=
-CLEAN:=
+
+JS_SRC:=$(shell find static/js -type f -and -name "*.js" 2> /dev/null)
+JS_CHECK:=$()
+HTML_SRC:=$(shell find static/html -type f -and -name "*.html" 2> /dev/null)
+HTML_CHECK:=$()
+CSS_SRC:=$(shell find static/css -type f -and -name "*.css" 2> /dev/null)
+CSS_CHECK:=$()
 
 ifeq ($(DO_CHECKJS),1)
-ALL+=$(JSCHECK)
-all: $(ALL)
-CLEAN+=$(JSCHECK)
+ALL+=$(JS_CHECK)
 endif # DO_CHECKJS
 
 ifeq ($(DO_CHECKHTML),1)
-ALL+=$(HTMLCHECK)
-all: $(ALL)
-CLEAN+=$(HTMLCHECK)
+ALL+=$(HTML_CHECK)
 endif # DO_CHECKHTML
 
 ifeq ($(DO_CHECKCSS),1)
-ALL+=$(CSSCHECK)
-all: $(ALL)
-CLEAN+=$(CSSCHECK)
+ALL+=$(CSS_CHECK)
 endif # DO_CHECKCSS
 
 # silent stuff
@@ -45,10 +45,6 @@ Q:=@
 #.SILENT:
 endif # DO_MKDBG
 
-SOURCES_JS:=$(shell find static/js -type f -and -name "*.js" 2> /dev/null)
-SOURCES_HTML:=$(shell find static/html -type f -and -name "*.html" 2> /dev/null)
-SOURCES_CSS:=$(shell find static/css -type f -and -name "*.css" 2> /dev/null)
-
 #########
 # rules #
 #########
@@ -59,10 +55,16 @@ all: $(ALL)
 .PHONY: debug
 debug:
 	$(info doing [$@])
+	$(info JS_SRC is $(JS_SRC))
+	$(info JS_CHECK is $(JS_CHECK))
+	$(info HTML_SRC is $(HTML_SRC))
+	$(info HTML_CHECK is $(HTML_CHECK))
+	$(info CSS_SRC is $(CSS_SRC))
+	$(info CSS_CHECK is $(CSS_CHECK))
 .PHONY: clean
 clean:
 	$(info doing [$@])
-	$(Q)-rm -f $(CLEAN)
+	$(Q)-rm -f $(ALL)
 .PHONY: clean_hard
 clean_hard:
 	$(info doing [$@])
@@ -71,15 +73,15 @@ clean_hard:
 ############
 # patterns #
 ############
-$(JSCHECK): $(SOURCES_JS)
+$(JS_CHECK): out/%.check: %.js
 	$(info doing [$@])
 	$(Q)pymakehelper touch_mkdir $@
-$(HTMLCHECK): $(SOURCES_HTML)
+$(HTML_CHECK): out/%.check: %.html
 	$(info doing [$@])
 	$(Q)pymakehelper only_print_on_error node_modules/.bin/htmlhint $<
 	$(Q)tidy -errors -q -utf8 $<
 	$(Q)pymakehelper touch_mkdir $@
-$(CSSCHECK): $(SOURCES_CSS)
+$(CSS_CHECK): out/%.check: %.css
 	$(info doing [$@])
 	$(Q)pymakehelper only_print_on_error node_modules/.bin/stylelint $<
 	$(Q)pymakehelper touch_mkdir $@
