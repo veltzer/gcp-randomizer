@@ -6,10 +6,7 @@ This is the main entry point to the application
 import random
 from flask import Flask, render_template, request
 
-app = Flask(
-    __name__,
-    template_folder="static/templates",
-)
+app = Flask(__name__)
 
 MODES = [
     "Ionian",
