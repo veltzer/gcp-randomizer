@@ -55,7 +55,7 @@ def modes():
     random.shuffle(randomized_modes)
     return render_template("index.html", randomized_modes=randomized_modes)
 
-@app.route("/general")
+@app.route("/general", methods=["GET", "POST"])
 def general():
     """ this is the root url """
     randomized_list = []
