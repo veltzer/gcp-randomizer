@@ -3,11 +3,26 @@ This is the main entry point to the application
 """
 
 
+import json
+import os
 import random
 
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
+
+
+def load_build_info():
+    """ Load the deploy stamp written by gcloud_run_deploy.sh; absent in dev. """
+    try:
+        with open("build_info.json", encoding="UTF8") as fp:
+            info = json.load(fp)
+    except FileNotFoundError:
+        info = {"deploy_date": "unknown", "git_describe": "dev"}
+    app.config["build_info"] = info
+
+
+load_build_info()
 
 MODES = [
     "Ionian",
@@ -18,6 +33,15 @@ MODES = [
     "Aeolian",
     "Locrian"
 ]
+
+@app.route("/app/version", methods=["GET"])
+def version():
+    """ the deploy stamp and the serving revision """
+    info = dict(app.config["build_info"])
+    # Cloud Run injects the serving revision name at runtime.
+    info["revision"] = os.environ.get("K_REVISION", "local")
+    return jsonify(info)
+
 
 @app.route("/")
 def root():
