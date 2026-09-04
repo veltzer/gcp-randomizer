@@ -35,3 +35,15 @@ def test_general_post():
     for item in ("scales", "arpeggios", "chords"):
         assert item.encode() in response.body
     assert b"Randomized List" in response.body
+
+
+def test_build_details_in_footer():
+    """ every page shows the build details in its footer. """
+    application = webtest.TestApp(main.app)
+
+    build = main.build_details()
+    for path in ('/', '/general'):
+        response = application.get(path)
+        assert f"build {build['git_describe']}".encode() in response.body
+        assert f"deployed {build['deploy_date']}".encode() in response.body
+        assert b"revision local" in response.body

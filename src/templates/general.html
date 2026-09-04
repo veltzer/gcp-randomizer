@@ -27,5 +27,8 @@
         {% endfor %}
     </ul>
     {% endif %}
+    <footer style="margin-top: 40px; color: #888; font-size: 12px;">
+        build {{ build.git_describe }}, deployed {{ build.deploy_date }}, revision {{ build.revision }}
+    </footer>
 </body>
 </html>

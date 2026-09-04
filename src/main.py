@@ -24,6 +24,20 @@ def load_build_info():
 
 load_build_info()
 
+
+def build_details():
+    """ the deploy stamp plus the serving revision, for /app/version and page footers """
+    info = dict(app.config["build_info"])
+    # Cloud Run injects the serving revision name at runtime.
+    info["revision"] = os.environ.get("K_REVISION", "local")
+    return info
+
+
+@app.context_processor
+def inject_build_details():
+    """ make the build details available to every template as `build` """
+    return {"build": build_details()}
+
 MODES = [
     "Ionian",
     "Dorian",
@@ -37,10 +51,7 @@ MODES = [
 @app.route("/app/version", methods=["GET"])
 def version():
     """ the deploy stamp and the serving revision """
-    info = dict(app.config["build_info"])
-    # Cloud Run injects the serving revision name at runtime.
-    info["revision"] = os.environ.get("K_REVISION", "local")
-    return jsonify(info)
+    return jsonify(build_details())
 
 
 @app.route("/")
