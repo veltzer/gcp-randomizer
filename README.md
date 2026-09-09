@@ -1,11 +1,11 @@
 <!-- This file is generated. Do not edit it by hand: your changes will be
      lost on the next build. Edit the template it is rendered from, or the
      values that template reads, and build again. -->
-# *randomizer* project by Mark Veltzer
+# *gcp-randomizer* project by Mark Veltzer
 
-description: randomize lists for you
+description: This is a project to create various randomized lists for practice
 
-project website: https://veltzer.github.io/randomizer
+project website: https://veltzer.github.io/gcp-randomizer
 
 author: Mark Veltzer
 
@@ -15,11 +15,11 @@ version: 0.0.1
 
 ## github
 
-![License](https://img.shields.io/github/license/veltzer/randomizer)
+![License](https://img.shields.io/github/license/veltzer/gcp-randomizer)
 
 ## build
 
-![build](https://github.com/veltzer/randomizer/workflows/build/badge.svg)
+![build](https://github.com/veltzer/gcp-randomizer/workflows/build/badge.svg)
 
 ## contact me
 
