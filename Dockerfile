@@ -1,5 +1,5 @@
 # Cloud Run image for the randomizer Flask app, built by Cloud Build via
-# `gcloud run deploy --source .` (see gcloud_run_deploy.sh from utils-bash).
+# `gcloud run deploy --source .` (see gcloud_deploy.sh from utils-bash).
 # Dependencies come from uv.lock, the single place versions are controlled.
 FROM python:3.14-slim
 
@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY src ./src
-# The deploy stamp is written by gcloud_run_deploy.sh just before deploying;
+# The deploy stamp is written by gcloud_deploy.sh just before deploying;
 # building without it fails on purpose so an unstamped image never ships.
 COPY build_info.json ./
 

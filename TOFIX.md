@@ -13,4 +13,4 @@ Findings from a code scan on 2026-10-04.
 - `pyproject.toml:26` - `mypy_path = "src:python:scripts"` names `python/` and `scripts/`, which do not exist here; set it to `"src"`.
 - `src/main.py:71` - the `general()` docstring says "this is the root url"; it is the free-form list randomizer.
 - `doc/TODO.txt`, `doc/DONE.txt` - both files are empty; delete them.
-- `README.md:6` - the README never says what the app does (modes page, `/general` list shuffler) or how it is run and deployed (`gcloud_run_deploy.sh`, `.gcp.conf`). Add that through a `tera.snippets/main.md.tera` snippet, the template's extension point.
+- `README.md:6` - the README never says what the app does (modes page, `/general` list shuffler) or how it is run and deployed (`gcloud_deploy.sh`, `.gcp.conf`). Add that through a `tera.snippets/main.md.tera` snippet, the template's extension point.

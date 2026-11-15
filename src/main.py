@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 
 def load_build_info():
-    """ Load the deploy stamp written by gcloud_run_deploy.sh; absent in dev. """
+    """ Load the deploy stamp written by gcloud_deploy.sh; absent in dev. """
     try:
         with open(BUILD_INFO, encoding="UTF8") as fp:
             info = json.load(fp)
