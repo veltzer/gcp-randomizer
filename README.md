@@ -5,7 +5,7 @@
 
 description: This is a project to create various randomized lists for practice
 
-project website: https://veltzer.github.io/gcp-randomizer
+project website: <https://veltzer.github.io/gcp-randomizer>
 
 author: Mark Veltzer
 
