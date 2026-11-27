@@ -1,8 +1,13 @@
 """ Test the randomizer flask app end to end with webtest. """
 
+from typing import TYPE_CHECKING
+
 import webtest
 
 import main
+
+if TYPE_CHECKING:
+    import pytest
 
 
 def test_get():
@@ -72,3 +77,28 @@ def test_build_details_in_footer():
         assert f"build {build['git_describe']}".encode() in response.body
         assert f"deployed {build['deploy_date']}".encode() in response.body
         assert b"revision local" in response.body
+
+
+def test_canonical_host(monkeypatch: pytest.MonkeyPatch):
+    """ with a canonical host set, other hostnames redirect to it and pages name it. """
+    monkeypatch.setitem(main.app.config, "CANONICAL_HOST", "randomizer.veltzer.org")
+    application = webtest.TestApp(main.app)
+
+    response = application.get('/general?x=1', extra_environ={"HTTP_HOST": "randomizer-123.us-central1.run.app"})
+    assert response.status_int == 308
+    assert response.location == "https://randomizer.veltzer.org/general?x=1"
+    # a revision can still be asked what it is on any hostname
+    assert application.get('/app/version', extra_environ={"HTTP_HOST": "randomizer-123.us-central1.run.app"}).status_int == 200
+
+    response = application.get('/general', extra_environ={"HTTP_HOST": "randomizer.veltzer.org"})
+    assert response.status_int == 200
+    assert b'<link rel="canonical" href="https://randomizer.veltzer.org/general">' in response.body
+
+
+def test_no_canonical_host():
+    """ without a canonical host (development) nothing redirects and a page names the address it was asked on. """
+    application = webtest.TestApp(main.app)
+
+    response = application.get('/', extra_environ={"HTTP_HOST": "anything.example"})
+    assert response.status_int == 200
+    assert b'<link rel="canonical" href="http://anything.example/">' in response.body

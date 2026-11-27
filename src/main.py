@@ -6,13 +6,21 @@ This is the main entry point to the application
 import json
 import os
 import random
+import urllib.parse
+from typing import TYPE_CHECKING
 
-from flask import Flask, Response, jsonify, render_template, request
+from flask import Flask, Response, jsonify, redirect, render_template, request
+
+if TYPE_CHECKING:
+    from werkzeug.wrappers import Response as WerkzeugResponse
 
 # build_info.json is written next to src/, at the repo (and image) root.
 BUILD_INFO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build_info.json")
 
 app = Flask(__name__)
+# The hostname the site is meant to be reached on (gcp_domain in .gcp.conf);
+# empty in development.
+app.config["CANONICAL_HOST"] = os.environ.get("CANONICAL_HOST", "")
 
 
 def load_build_info():
@@ -36,10 +44,32 @@ def build_details():
     return info
 
 
+def canonical_url() -> str:
+    """ this page's address on the canonical host; in development, where there is none, as it was asked for """
+    host = app.config["CANONICAL_HOST"]
+    if not host:
+        return request.base_url
+    return urllib.parse.urlunsplit(("https", host, request.path, "", ""))
+
+
+@app.before_request
+def redirect_to_canonical_host() -> WerkzeugResponse | None:
+    """
+    Cloud Run also answers on its run.app hostnames. Send those to the custom
+    domain, so the site has one address. /app/version is exempt, so a
+    revision can still be asked directly what it is.
+    """
+    host = app.config["CANONICAL_HOST"]
+    if not host or request.host == host or request.path == "/app/version":
+        return None
+    url = urllib.parse.urlsplit(request.url)._replace(scheme="https", netloc=host).geturl()
+    return redirect(url, code=308)
+
+
 @app.context_processor
 def inject_build_details():
-    """ make the build details available to every template as `build` """
-    return {"build": build_details()}
+    """ make the build details (`build`) and the page's canonical address available to every template """
+    return {"build": build_details(), "canonical_url": canonical_url()}
 
 MODES = [
     "Ionian",
