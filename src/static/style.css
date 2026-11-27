@@ -179,11 +179,21 @@ a:focus-visible {
 	border-radius: 50%;
 }
 
-footer {
-	max-width: 40rem;
-	margin: 1.5rem auto 0;
-	padding: 1rem;
-	font-size: 0.75rem;
+.footer {
+	padding: 1.5rem 1rem;
+	font-size: 0.85rem;
 	color: var(--muted);
-	border-top: 1px solid var(--line);
+	text-align: center;
+}
+
+.footer p {
+	margin: 0.2rem 0;
+}
+
+.footer a {
+	color: inherit;
+}
+
+.footer .inscription {
+	font-size: 0.75rem;
 }

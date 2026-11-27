@@ -6,16 +6,22 @@ This is the main entry point to the application
 import json
 import os
 import random
+import re
 import urllib.parse
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from flask import Flask, Response, jsonify, redirect, render_template, request
+from markupsafe import Markup
 
 if TYPE_CHECKING:
     from werkzeug.wrappers import Response as WerkzeugResponse
 
 # build_info.json is written next to src/, at the repo (and image) root.
 BUILD_INFO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build_info.json")
+
+# where the code lives, for the footer's "built from" line
+REPO = "veltzer/gcp-randomizer"
 
 app = Flask(__name__)
 # The hostname the site is meant to be reached on (gcp_domain in .gcp.conf);
@@ -44,6 +50,45 @@ def build_details():
     return info
 
 
+def built_line(info: dict[str, str]) -> Markup:
+    """
+    The footer's last line, as the other sites of the fleet word it: which
+    commit of which repository was built, when, and which revision serves it.
+    Each part is said only when the deploy stamp really carries it.
+    """
+    line = Markup("Built")
+    commit = re.search(r"(?:-g)?([0-9a-f]{7,40})(?:-dirty)?$", info.get("git_describe") or "")
+    if commit:
+        line += Markup(' from <a href="https://github.com/{repo}">{repo}</a> commit <a href="https://github.com/{repo}/commit/{commit}"><code>{commit}</code></a>').format(
+            repo=REPO, commit=commit.group(1),
+        )
+    stamp = deploy_stamp(info)
+    if stamp:
+        line += Markup(' on <time datetime="{date}">{text} UTC</time>').format(date=info["deploy_date"], text=stamp.replace("T", " "))
+    if info["revision"] == "local":
+        return line + " (local)"
+    return line + Markup(", serving as {revision}").format(revision=info["revision"])
+
+
+def deploy_stamp(info: dict[str, str]) -> str:
+    """ the deploy time to the minute (2026-11-27T19:37), or nothing when the stamp holds no real date """
+    stamp = re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", info.get("deploy_date") or "")
+    return stamp.group() if stamp else ""
+
+
+def provenance() -> dict[str, str]:
+    """
+    What the page footer says about where the page came from. The copyright
+    year is read off the deploy stamp, so the same deploy always says the same.
+    """
+    info = build_details()
+    stamp = deploy_stamp(info)
+    return {
+        "year": stamp[:4] if stamp else str(datetime.now(UTC).year),
+        "built": built_line(info),
+    }
+
+
 def canonical_url() -> str:
     """ this page's address on the canonical host; in development, where there is none, as it was asked for """
     host = app.config["CANONICAL_HOST"]
@@ -68,8 +113,8 @@ def redirect_to_canonical_host() -> WerkzeugResponse | None:
 
 @app.context_processor
 def inject_build_details():
-    """ make the build details (`build`) and the page's canonical address available to every template """
-    return {"build": build_details(), "canonical_url": canonical_url()}
+    """ make the footer's provenance (`site`) and the page's canonical address available to every template """
+    return {"site": provenance(), "canonical_url": canonical_url()}
 
 MODES = [
     "Ionian",

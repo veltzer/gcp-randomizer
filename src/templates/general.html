@@ -35,8 +35,10 @@
 			</ul>
 			{% endif %}
 		</main>
-		<footer>
-			build {{ build.git_describe }}, deployed {{ build.deploy_date }}, revision {{ build.revision }}
+		<footer class="footer">
+			<p>&copy; {{ site.year }} Mark Veltzer &middot; <a href="https://veltzer.org">veltzer.org</a></p>
+			<p class="inscription">Randomizer is a system written by Mark Veltzer &lt;<a href="mailto:mark.veltzer@gmail.com">mark.veltzer@gmail.com</a>&gt;</p>
+			<p class="inscription">{{ site.built }}</p>
 		</footer>
 	</body>
 </html>

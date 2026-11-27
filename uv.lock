@@ -66,6 +66,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "gunicorn" },
+    { name = "markupsafe" },
     { name = "webtest" },
 ]
 
@@ -81,6 +82,7 @@ dev = [
 requires-dist = [
     { name = "flask" },
     { name = "gunicorn" },
+    { name = "markupsafe" },
     { name = "webtest" },
 ]
 

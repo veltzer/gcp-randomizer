@@ -67,16 +67,32 @@ def test_general_post():
     assert b"Randomized List" in response.body
 
 
-def test_build_details_in_footer():
-    """ every page shows the build details in its footer. """
+def test_footer(monkeypatch: pytest.MonkeyPatch):
+    """ every page's footer says who wrote the site and which deploy is serving it. """
+    monkeypatch.setitem(main.app.config, "build_info", {"deploy_date": "2026-11-27T19:37:59+00:00", "git_describe": "v1-3-gdc5cfe6"})
+    monkeypatch.setenv("K_REVISION", "randomizer-00009-j5g")
     application = webtest.TestApp(main.app)
 
-    build = main.build_details()
     for path in ('/', '/general'):
-        response = application.get(path)
-        assert f"build {build['git_describe']}".encode() in response.body
-        assert f"deployed {build['deploy_date']}".encode() in response.body
-        assert b"revision local" in response.body
+        body = " ".join(application.get(path).text.split())
+        assert "&copy; 2026 Mark Veltzer" in body
+        assert '<a href="https://veltzer.org">veltzer.org</a>' in body
+        assert "Randomizer is a system written by Mark Veltzer" in body
+        assert 'from <a href="https://github.com/veltzer/gcp-randomizer">veltzer/gcp-randomizer</a>' in body
+        assert '<a href="https://github.com/veltzer/gcp-randomizer/commit/dc5cfe6"><code>dc5cfe6</code></a>' in body
+        assert 'on <time datetime="2026-11-27T19:37:59+00:00">2026-11-27 19:37 UTC</time>, serving as randomizer-00009-j5g' in body
+
+
+def test_footer_in_development(monkeypatch: pytest.MonkeyPatch):
+    """ without a deploy stamp the footer names no commit and no deploy time. """
+    monkeypatch.setitem(main.app.config, "build_info", {"deploy_date": "unknown", "git_describe": "dev"})
+    monkeypatch.delenv("K_REVISION", raising=False)
+    application = webtest.TestApp(main.app)
+
+    body = " ".join(application.get('/').text.split())
+    assert "Built (local)" in body
+    assert "/commit/" not in body
+    assert "<time" not in body
 
 
 def test_canonical_host(monkeypatch: pytest.MonkeyPatch):
