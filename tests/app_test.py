@@ -39,6 +39,17 @@ def test_favicon():
     assert response.body == icon.body
 
 
+def test_stylesheet():
+    """ the shared stylesheet is served and every page links it. """
+    application = webtest.TestApp(main.app)
+
+    style = application.get('/static/style.css')
+    assert style.status_int == 200
+    assert style.content_type == "text/css"
+    for path in ('/', '/general'):
+        assert b'<link rel="stylesheet" href="/static/style.css">' in application.get(path).body
+
+
 def test_general_post():
     """ POST /general shuffles the submitted lines and drops blank ones. """
     application = webtest.TestApp(main.app)
