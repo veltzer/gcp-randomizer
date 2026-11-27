@@ -72,7 +72,7 @@ def modes():
 @app.route("/general", methods=["GET", "POST"])
 def general():
     """ this is the root url """
-    randomized_list = []
+    randomized_list: list[str] = []
     if request.method == "POST":
         items = request.form["items"].split("\n")
         items = [item.strip() for item in items if item.strip()]
