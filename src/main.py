@@ -7,7 +7,7 @@ import json
 import os
 import random
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request
 
 # build_info.json is written next to src/, at the repo (and image) root.
 BUILD_INFO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build_info.json")
@@ -55,6 +55,12 @@ MODES = [
 def version():
     """ the deploy stamp and the serving revision """
     return jsonify(build_details())
+
+
+@app.route("/favicon.ico", methods=["GET"])
+def favicon() -> Response:
+    """ the site icon, for clients that ask for /favicon.ico without reading a page's <link rel="icon"> """
+    return app.send_static_file("favicon.svg")
 
 
 @app.route("/")

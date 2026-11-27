@@ -25,6 +25,20 @@ def test_version():
         assert key in response.json
 
 
+def test_favicon():
+    """ the icon is served under /static, named by every page, and answers /favicon.ico. """
+    application = webtest.TestApp(main.app)
+
+    icon = application.get('/static/favicon.svg')
+    assert icon.status_int == 200
+    assert icon.content_type == "image/svg+xml"
+    for path in ('/', '/general'):
+        assert b'<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">' in application.get(path).body
+    response = application.get('/favicon.ico')
+    assert response.content_type == "image/svg+xml"
+    assert response.body == icon.body
+
+
 def test_general_post():
     """ POST /general shuffles the submitted lines and drops blank ones. """
     application = webtest.TestApp(main.app)
