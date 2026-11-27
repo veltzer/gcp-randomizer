@@ -65,6 +65,28 @@ src_files = ["README.md"]
 [processor.checker.idockerfile]
 src_files = ["Dockerfile"]
 
+# ─── xml / svg ───────────────────────────────────────────────────────────────
+
+[processor.checker.ixmllint]
+# warnings fail too, not only fatal errors
+strict = true
+src_dirs = ["src/static"]
+
+# ─── css ─────────────────────────────────────────────────────────────────────
+
+# Only .css is passed: .biome.jsonc turns biome's JavaScript and JSON linters
+# off, oxlint covers JavaScript.
+[processor.checker.biome]
+src_dirs = ["src/static"]
+src_extensions = [".css"]
+
+# ─── javascript ──────────────────────────────────────────────────────────────
+
+[processor.checker.oxlint]
+src_dirs = ["src/static"]
+args = ["-c", ".oxlintrc.repo.json"]
+dep_inputs = [".oxlintrc.repo.json"]
+
 # every lint suppression names a rule and says why (see the fleet's CLAUDE.md)
 [processor.checker.suppressions]
 src_dirs = [".github", "config", "src", "tests"]

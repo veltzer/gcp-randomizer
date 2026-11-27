@@ -55,6 +55,17 @@ def test_stylesheet():
         assert b'<link rel="stylesheet" href="/static/style.css">' in application.get(path).body
 
 
+def test_script():
+    """ the script that says times in the reader's locale is served and every page loads it. """
+    application = webtest.TestApp(main.app)
+
+    script = application.get('/static/app.js')
+    assert script.status_int == 200
+    assert b"localizeTimes" in script.body
+    for path in ('/', '/general'):
+        assert b'<script src="/static/app.js" defer></script>' in application.get(path).body
+
+
 def test_general_post():
     """ POST /general shuffles the submitted lines and drops blank ones. """
     application = webtest.TestApp(main.app)
